@@ -1,8 +1,10 @@
 package com.relex.relex_social.controller;
 
+import com.relex.relex_social.dto.request.EditProfileRequest;
 import com.relex.relex_social.exception.EmailAlreadyExistsException;
 import com.relex.relex_social.exception.NicknameAlreadyExistsException;
 import com.relex.relex_social.dto.request.CreateProfileRequest;
+import com.relex.relex_social.exception.ResourceNotFoundException;
 import com.relex.relex_social.service.ProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -33,5 +35,11 @@ public class ProfileController {
     @GetMapping
     public ResponseEntity<List<String>> getAllUsers(){
         return ResponseEntity.ok().body(profileService.getAllUsernamesAndRealNames());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity editProfile(@PathVariable Long id, @RequestBody EditProfileRequest editProfileRequest) throws ResourceNotFoundException, EmailAlreadyExistsException, NicknameAlreadyExistsException {
+        profileService.edit(id, editProfileRequest);
+        return ResponseEntity.noContent().build();
     }
 }

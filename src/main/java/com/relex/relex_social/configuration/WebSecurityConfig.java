@@ -1,7 +1,7 @@
 package com.relex.relex_social.configuration;
 
 import com.relex.relex_social.security.JwtRequestFilter;
-import com.relex.relex_social.service.ProfileService;
+import com.relex.relex_social.service.ProfileDetailsService;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
@@ -23,7 +23,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableGlobalMethodSecurity(securedEnabled = true)
 @AllArgsConstructor
 public class WebSecurityConfig{
-    private final ProfileService profileService;
+    private final ProfileDetailsService profileDetailsService;
     private final PasswordEncoder passwordEncoder;
     private final JwtRequestFilter jwtRequestFilter;
 
@@ -35,6 +35,7 @@ public class WebSecurityConfig{
                     .antMatchers("/auth/**","/test/**").permitAll()
                     .antMatchers(HttpMethod.POST, "/profiles").permitAll()
                     .antMatchers(HttpMethod.GET, "/profiles").authenticated()
+                    .antMatchers(HttpMethod.PUT, "/profiles/**").authenticated()
                     .anyRequest().authenticated()
                 .and()
                     .logout().permitAll()
@@ -71,7 +72,7 @@ public class WebSecurityConfig{
     public DaoAuthenticationProvider daoAuthenticationProvider(){
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
         daoAuthenticationProvider.setPasswordEncoder(passwordEncoder);
-        daoAuthenticationProvider.setUserDetailsService(profileService);
+        daoAuthenticationProvider.setUserDetailsService(profileDetailsService);
         return daoAuthenticationProvider;
     }
 

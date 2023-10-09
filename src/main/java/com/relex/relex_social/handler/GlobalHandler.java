@@ -2,9 +2,11 @@ package com.relex.relex_social.handler;
 
 import com.relex.relex_social.exception.EmailAlreadyExistsException;
 import com.relex.relex_social.exception.NicknameAlreadyExistsException;
+import com.relex.relex_social.exception.ResourceNotFoundException;
 import lombok.extern.java.Log;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.ObjectError;
@@ -49,5 +51,17 @@ public class GlobalHandler {
     protected ResponseEntity<String> handleBadCredentialsException(BadCredentialsException e){
         log.log(Level.INFO, "Unsuccessful authentication due to invalid login or password", e);
         return new ResponseEntity("Username or password is not correct", HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    protected  ResponseEntity<String> handleResourceNotFoundExcception(ResourceNotFoundException e){
+        log.log(Level.INFO, "Getting access to a non-existent resource", e);
+        return new ResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    protected  ResponseEntity<String> handleAccessDeniedException(AccessDeniedException e){
+        log.log(Level.INFO, "Attempt to access someone else's resource", e);
+        return new ResponseEntity(e.getMessage(), HttpStatus.FORBIDDEN);
     }
 }
