@@ -23,7 +23,6 @@ public class ProfileService{
     private final ProfileRepository profileRepository;
     private final PasswordEncoder passwordEncoder;
     private final ProfileUtils profileUtils;
-    private final AuthService authService;
 
     @Transactional
     public Long register(CreateProfileRequest request) throws NicknameAlreadyExistsException, EmailAlreadyExistsException {
@@ -52,9 +51,8 @@ public class ProfileService{
     }
 
     @Transactional
-    public void edit(EditProfileRequest editProfileRequest) throws ResourceNotFoundException, NicknameAlreadyExistsException, EmailAlreadyExistsException {
-        Long authId = authService.getAuthId();
-        Profile profileToEdit = profileRepository.findById(authId).orElseThrow(() -> new ResourceNotFoundException(String.format("User with id %d not found", authId)));
+    public void edit(Long profileId, EditProfileRequest editProfileRequest) throws ResourceNotFoundException, NicknameAlreadyExistsException, EmailAlreadyExistsException {
+        Profile profileToEdit = profileRepository.findById(profileId).orElseThrow(() -> new ResourceNotFoundException(String.format("User with id %d not found", profileId)));
 
         if(!profileToEdit.getNickname().equals(editProfileRequest.getNickname()) && profileRepository.existsByNickname(editProfileRequest.getNickname())){
             throw new NicknameAlreadyExistsException();

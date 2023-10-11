@@ -16,12 +16,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MessageService {
     private final MessageRepository messageRepository;
-    private final AuthService authService;
     private final MessageUtils messageUtils;
 
-    public Long send(Long recipientId, String messageText) {
+    public Long send(Long senderId, Long recipientId, String messageText) {
         Message message = Message.builder()
-                .senderId(authService.getAuthId())
+                .senderId(senderId)
                 .recipientId(recipientId)
                 .sendTime(new Timestamp(new Date().getTime()))
                 .messageText(messageText)
@@ -29,8 +28,8 @@ public class MessageService {
         return messageRepository.save(message).getId();
     }
 
-    public List<MessageDto> getConversation(Long chatPartnerId) {
-        return messageRepository.getMessagesBetweenUsers(authService.getAuthId(),chatPartnerId).stream()
+    public List<MessageDto> getConversation(Long profileId, Long chatPartnerId) {
+        return messageRepository.getMessagesBetweenUsers(profileId,chatPartnerId).stream()
                 .map(messageUtils::toDto).collect(Collectors.toList());
     }
 

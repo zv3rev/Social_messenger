@@ -1,5 +1,6 @@
 package com.relex.relex_social.security;
 
+import com.relex.relex_social.service.JwtTokenService;
 import com.relex.relex_social.utility.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 public class JwtRequestFilter extends OncePerRequestFilter {
 
     private final JwtTokenUtils jwtTokenUtils;
+    private final JwtTokenService jwtTokenService;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
@@ -48,7 +50,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private void setSecurityContextHolderAuthentication(HttpServletRequest request, String jwtToken) {
         String username = jwtTokenUtils.getUsername(jwtToken);
         List<String> roles = jwtTokenUtils.getRoles(jwtToken);
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        if (username != null && jwtTokenService.isTokenValid(jwtToken) && SecurityContextHolder.getContext().getAuthentication() == null) {
             UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
                     username, null, roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()));
             token.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

@@ -1,6 +1,7 @@
 package com.relex.relex_social.controller;
 
 import com.relex.relex_social.dto.response.MessageDto;
+import com.relex.relex_social.service.AuthService;
 import com.relex.relex_social.service.MessageService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,10 +15,12 @@ import java.util.List;
 @RequestMapping("/messages")
 public class MessageController {
     private final MessageService messageService;
+    private final AuthService authService;
 
     @PostMapping
     public ResponseEntity sendMessage(@RequestParam Long recipientId, @RequestBody String messageText) {
-        Long messageId = messageService.send(recipientId, messageText);
+        Long profileId = authService.getAuthId();
+        Long messageId = messageService.send(profileId, recipientId, messageText);
         return ResponseEntity.created(
                         ServletUriComponentsBuilder
                                 .fromCurrentRequest()
@@ -29,7 +32,8 @@ public class MessageController {
 
     @GetMapping
     public ResponseEntity getConversationWithUser(@RequestParam Long chatPartnerId) {
-        List<MessageDto> messageList = messageService.getConversation(chatPartnerId);
+        Long profileId = authService.getAuthId();
+        List<MessageDto> messageList = messageService.getConversation(profileId, chatPartnerId);
         return ResponseEntity.ok().body(messageList);
     }
 }
