@@ -1,8 +1,11 @@
 package com.relex.relex_social.service;
 
 import com.relex.relex_social.dto.request.JwtRequest;
+import com.relex.relex_social.entity.Profile;
+import com.relex.relex_social.repository.ProfileRepository;
 import com.relex.relex_social.utility.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -14,6 +17,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthService {
     private final ProfileDetailsService profileDetailsService;
+    private final ProfileRepository profileRepository;
     private final JwtTokenUtils jwtTokenUtils;
     private final AuthenticationManager authenticationManager;
 
@@ -25,11 +29,19 @@ public class AuthService {
         return token;
     }
 
-    protected String getAuthUserNickname(){
+    private Profile getAuthUser(){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null) {
             return null;
         }
-        return auth.getPrincipal().toString();
+        return profileRepository.findByNickname(auth.getPrincipal().toString()).orElse(null);
+    }
+
+    protected Long getAuthId() {
+        Profile authProfile = getAuthUser();
+        if (authProfile == null){
+            throw new AccessDeniedException("Access attempt by an un-authenticated user");
+        }
+        return authProfile.getId();
     }
 }

@@ -1,9 +1,9 @@
 package com.relex.relex_social.controller;
 
+import com.relex.relex_social.dto.request.CreateProfileRequest;
 import com.relex.relex_social.dto.request.EditProfileRequest;
 import com.relex.relex_social.exception.EmailAlreadyExistsException;
 import com.relex.relex_social.exception.NicknameAlreadyExistsException;
-import com.relex.relex_social.dto.request.CreateProfileRequest;
 import com.relex.relex_social.exception.ResourceNotFoundException;
 import com.relex.relex_social.service.ProfileService;
 import lombok.RequiredArgsConstructor;
@@ -37,9 +37,9 @@ public class ProfileController {
         return ResponseEntity.ok().body(profileService.getAllUsernamesAndRealNames());
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity editProfile(@PathVariable Long id, @RequestBody EditProfileRequest editProfileRequest) throws ResourceNotFoundException, EmailAlreadyExistsException, NicknameAlreadyExistsException {
-        profileService.edit(id, editProfileRequest);
+    @PutMapping
+    public ResponseEntity editProfile(@RequestBody EditProfileRequest editProfileRequest) throws ResourceNotFoundException, EmailAlreadyExistsException, NicknameAlreadyExistsException {
+        profileService.edit(editProfileRequest);
         return ResponseEntity.noContent().build();
     }
 }
