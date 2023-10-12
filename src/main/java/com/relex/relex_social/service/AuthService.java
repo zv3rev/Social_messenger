@@ -48,4 +48,9 @@ public class AuthService {
         }
         return authProfile.getId();
     }
+
+    @Transactional
+    public void deleteToken(Long profileId) {
+        jwtTokenService.invalidToken(profileId);
+    }
 }

@@ -27,7 +27,7 @@ public class JwtTokenService {
         return jwtTokenRepository.existsByToken(token);
     }
 
-    public void invalidToken(String token){
-        jwtTokenRepository.deleteByToken(token);
+    public void invalidToken(Long profileId){
+        jwtTokenRepository.deleteByProfileId(profileId);
     }
 }

@@ -6,6 +6,7 @@ import com.relex.relex_social.service.AuthService;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,5 +20,12 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity createToken(@RequestBody JwtRequest jwtRequest){
         return ResponseEntity.ok(new JwtResponse(authService.createToken(jwtRequest),""));
+    }
+
+    @DeleteMapping("/logout")
+    public ResponseEntity deleteToken(){
+        Long profileId = authService.getAuthId();
+        authService.deleteToken(profileId);
+        return ResponseEntity.noContent().build();
     }
 }
