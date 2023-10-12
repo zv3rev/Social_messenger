@@ -7,6 +7,7 @@ import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -68,11 +69,13 @@ public class JwtTokenUtils {
             return true;
         } catch (SignatureException e) {
             log.log(Level.INFO, "A token with an incorrect signature was received", e);
+            throw new AccessDeniedException("A token with an incorrect signature was received");
         } catch (ExpiredJwtException e) {
            log.log(Level.INFO, "Expired token received", e);
+           throw new AccessDeniedException("Expired token received");
         } catch (Exception e) {
             log.log(Level.INFO, "Unexpected error while validating JWT", e);
+            throw new AccessDeniedException("Unexpected error while validating JWT");
         }
-        return false;
     }
 }

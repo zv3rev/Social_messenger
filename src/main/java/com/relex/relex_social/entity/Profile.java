@@ -23,4 +23,5 @@ public class Profile {
     String firstName;
     String surname;
     String bio;
+    ProfileStatus profileStatus;
 }

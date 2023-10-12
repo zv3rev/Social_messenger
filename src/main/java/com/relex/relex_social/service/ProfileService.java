@@ -4,6 +4,7 @@ import com.relex.relex_social.dto.request.CreateProfileRequest;
 import com.relex.relex_social.dto.request.EditProfileRequest;
 import com.relex.relex_social.dto.response.ProfileDto;
 import com.relex.relex_social.entity.Profile;
+import com.relex.relex_social.entity.ProfileStatus;
 import com.relex.relex_social.exception.EmailAlreadyExistsException;
 import com.relex.relex_social.exception.NicknameAlreadyExistsException;
 import com.relex.relex_social.exception.ResourceNotFoundException;
@@ -24,6 +25,7 @@ public class ProfileService{
     private final ProfileRepository profileRepository;
     private final PasswordEncoder passwordEncoder;
     private final ProfileUtils profileUtils;
+    private final JwtTokenService jwtTokenService;
 
     @Transactional
     public Long register(CreateProfileRequest request) throws NicknameAlreadyExistsException, EmailAlreadyExistsException {
@@ -78,5 +80,14 @@ public class ProfileService{
         profileToChange.setPassword(newPassword);
         encodeProfilePassword(profileToChange);
         profileRepository.save(profileToChange);
+    }
+
+    @Transactional
+    public void delete(Long profileId) throws ResourceNotFoundException {
+        //TODO: Отправить сообщение на почту "Ваш аккаунт был удален, для востановления перейдите по ссылке"
+        Profile profileToDelete = profileRepository.findById(profileId).orElseThrow(() -> new ResourceNotFoundException(String.format("User with id %d not found", profileId)));
+        profileToDelete.setProfileStatus(ProfileStatus.DELETED);
+        profileRepository.save(profileToDelete);
+        jwtTokenService.invalidToken(profileId);
     }
 }

@@ -3,6 +3,7 @@ package com.relex.relex_social.utility;
 import com.relex.relex_social.dto.response.ProfileDto;
 import com.relex.relex_social.entity.Profile;
 import com.relex.relex_social.dto.request.CreateProfileRequest;
+import com.relex.relex_social.entity.ProfileStatus;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -15,6 +16,7 @@ public class ProfileUtils {
                 .firstName(request.getFirstName())
                 .surname(request.getSurname())
                 .bio(request.getBio())
+                .profileStatus(ProfileStatus.UNCONFIRMED)
                 .build();
     }
 

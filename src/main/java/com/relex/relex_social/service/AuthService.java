@@ -2,6 +2,9 @@ package com.relex.relex_social.service;
 
 import com.relex.relex_social.dto.request.JwtRequest;
 import com.relex.relex_social.entity.Profile;
+import com.relex.relex_social.entity.ProfileStatus;
+import com.relex.relex_social.exception.AccessToDeletedAccountException;
+import com.relex.relex_social.exception.ResourceNotFoundException;
 import com.relex.relex_social.repository.ProfileRepository;
 import com.relex.relex_social.utility.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;
@@ -24,12 +27,15 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
 
     @Transactional
-    public String createToken(JwtRequest jwtRequest){
+    public String createToken(JwtRequest jwtRequest) throws ResourceNotFoundException, AccessToDeletedAccountException {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(jwtRequest.getUsername(),jwtRequest.getPassword()));
         UserDetails userDetails = profileDetailsService.loadUserByUsername(jwtRequest.getUsername());
         String token = jwtTokenUtils.generateToken(userDetails);
-        Long profileId = profileRepository.findByNickname(jwtRequest.getUsername()).get().getId();
-        jwtTokenService.registerToken(profileId,token);
+        Profile profile = profileRepository.findByNickname(jwtRequest.getUsername()).orElseThrow(() -> new ResourceNotFoundException("User wasn't found"));
+        if (profile.getProfileStatus().equals(ProfileStatus.DELETED)){
+            throw new AccessToDeletedAccountException("You can not get access to deleted account");
+        }
+        jwtTokenService.registerToken(profile.getId(),token);
         return token;
     }
 

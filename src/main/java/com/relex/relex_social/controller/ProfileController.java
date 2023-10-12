@@ -42,8 +42,7 @@ public class ProfileController {
     @PutMapping
     public ResponseEntity editProfile(@RequestBody EditProfileRequest editProfileRequest) throws ResourceNotFoundException, EmailAlreadyExistsException, NicknameAlreadyExistsException {
         Long profileId = authService.getAuthId();
-        profileService.edit(profileId ,editProfileRequest);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().body(profileService.edit(profileId ,editProfileRequest));
     }
 
     @PatchMapping
@@ -51,5 +50,12 @@ public class ProfileController {
         Long profileId = authService.getAuthId();
         profileService.changePassword(profileId,newPassword);
         return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping
+    public ResponseEntity deleteProfile() throws ResourceNotFoundException {
+        Long profileId = authService.getAuthId();
+        profileService.delete(profileId);
+        return ResponseEntity.noContent().build();
     }
 }
