@@ -11,4 +11,5 @@ public interface ProfileRepository extends CrudRepository<Profile,Long> {
     Optional<Profile> findByNickname(String nickname);
     Boolean existsByNickname(String string);
     Boolean existsByEmail(String email);
+
 }

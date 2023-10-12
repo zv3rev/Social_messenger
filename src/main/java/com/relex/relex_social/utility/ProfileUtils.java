@@ -1,5 +1,6 @@
 package com.relex.relex_social.utility;
 
+import com.relex.relex_social.dto.response.ProfileDto;
 import com.relex.relex_social.entity.Profile;
 import com.relex.relex_social.dto.request.CreateProfileRequest;
 import org.springframework.stereotype.Component;
@@ -15,5 +16,15 @@ public class ProfileUtils {
                 .surname(request.getSurname())
                 .bio(request.getBio())
                 .build();
+    }
+
+    public ProfileDto toDto(Profile profile){
+        return new ProfileDto(
+                profile.getId(),
+                profile.getEmail(),
+                profile.getNickname(),
+                profile.getFirstName(),
+                profile.getSurname(),
+                profile.getBio());
     }
 }

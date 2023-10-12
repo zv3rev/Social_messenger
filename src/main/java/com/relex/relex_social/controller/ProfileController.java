@@ -45,4 +45,11 @@ public class ProfileController {
         profileService.edit(profileId ,editProfileRequest);
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping
+    public ResponseEntity changePassword(@RequestBody String newPassword) throws ResourceNotFoundException {
+        Long profileId = authService.getAuthId();
+        profileService.changePassword(profileId,newPassword);
+        return ResponseEntity.ok().build();
+    }
 }

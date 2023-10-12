@@ -2,6 +2,7 @@ package com.relex.relex_social.service;
 
 import com.relex.relex_social.dto.request.CreateProfileRequest;
 import com.relex.relex_social.dto.request.EditProfileRequest;
+import com.relex.relex_social.dto.response.ProfileDto;
 import com.relex.relex_social.entity.Profile;
 import com.relex.relex_social.exception.EmailAlreadyExistsException;
 import com.relex.relex_social.exception.NicknameAlreadyExistsException;
@@ -51,7 +52,7 @@ public class ProfileService{
     }
 
     @Transactional
-    public void edit(Long profileId, EditProfileRequest editProfileRequest) throws ResourceNotFoundException, NicknameAlreadyExistsException, EmailAlreadyExistsException {
+    public ProfileDto edit(Long profileId, EditProfileRequest editProfileRequest) throws ResourceNotFoundException, NicknameAlreadyExistsException, EmailAlreadyExistsException {
         Profile profileToEdit = profileRepository.findById(profileId).orElseThrow(() -> new ResourceNotFoundException(String.format("User with id %d not found", profileId)));
 
         if(!profileToEdit.getNickname().equals(editProfileRequest.getNickname()) && profileRepository.existsByNickname(editProfileRequest.getNickname())){
@@ -69,6 +70,13 @@ public class ProfileService{
         profileToEdit.setFirstName(editProfileRequest.getFirstName());
         profileToEdit.setSurname(editProfileRequest.getSurname());
         profileToEdit.setBio(editProfileRequest.getBio());
-        profileRepository.save(profileToEdit);
+        return profileUtils.toDto(profileRepository.save(profileToEdit));
+    }
+
+    public void changePassword(Long profileId, String newPassword) throws ResourceNotFoundException {
+        Profile profileToChange = profileRepository.findById(profileId).orElseThrow(() -> new ResourceNotFoundException(String.format("User with id %d not found", profileId)));
+        profileToChange.setPassword(newPassword);
+        encodeProfilePassword(profileToChange);
+        profileRepository.save(profileToChange);
     }
 }
