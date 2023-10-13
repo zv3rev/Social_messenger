@@ -1,5 +1,7 @@
 package com.relex.relex_social.dto.response;
 
+import com.relex.relex_social.entity.AllowedToSend;
+import com.relex.relex_social.entity.ProfileStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -12,4 +14,6 @@ public class ProfileDto {
     String firstName;
     String surname;
     String bio;
+    ProfileStatus status;
+    AllowedToSend allowedToSend;
 }

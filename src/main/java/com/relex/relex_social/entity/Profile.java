@@ -24,4 +24,5 @@ public class Profile {
     String surname;
     String bio;
     ProfileStatus profileStatus;
+    AllowedToSend allowedToSend;
 }

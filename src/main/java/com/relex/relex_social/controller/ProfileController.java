@@ -37,7 +37,7 @@ public class ProfileController {
     }
 
     @PutMapping
-    public ResponseEntity editProfile(@RequestBody EditProfileRequest editProfileRequest) {
+    public ResponseEntity editProfile(@RequestBody @Valid EditProfileRequest editProfileRequest) {
         Long profileId = authService.getAuthId();
         return ResponseEntity.ok().body(profileService.edit(profileId, editProfileRequest));
     }

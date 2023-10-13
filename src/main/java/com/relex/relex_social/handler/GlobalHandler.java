@@ -84,4 +84,10 @@ public class GlobalHandler {
         log.log(Level.INFO, "A method with unsuitable parameters was called", e);
         return getResponseEntity(e, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(SendingRestrictionException.class)
+    protected ResponseEntity handleSendingRestrictionException(SendingRestrictionException e){
+        log.log(Level.INFO, "Attempt to send a message to a user with a sending restriction", e);
+        return getResponseEntity(e, HttpStatus.BAD_REQUEST);
+    }
 }

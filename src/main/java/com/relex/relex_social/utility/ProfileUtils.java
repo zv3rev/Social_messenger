@@ -1,6 +1,7 @@
 package com.relex.relex_social.utility;
 
 import com.relex.relex_social.dto.response.ProfileDto;
+import com.relex.relex_social.entity.AllowedToSend;
 import com.relex.relex_social.entity.Profile;
 import com.relex.relex_social.dto.request.CreateProfileRequest;
 import com.relex.relex_social.entity.ProfileStatus;
@@ -17,6 +18,7 @@ public class ProfileUtils {
                 .surname(request.getSurname())
                 .bio(request.getBio())
                 .profileStatus(ProfileStatus.UNCONFIRMED)
+                .allowedToSend(AllowedToSend.ALL)
                 .build();
     }
 
@@ -27,6 +29,8 @@ public class ProfileUtils {
                 profile.getNickname(),
                 profile.getFirstName(),
                 profile.getSurname(),
-                profile.getBio());
+                profile.getBio(),
+                profile.getProfileStatus(),
+                profile.getAllowedToSend());
     }
 }

@@ -1,5 +1,6 @@
 package com.relex.relex_social.dto.request;
 
+import com.relex.relex_social.entity.AllowedToSend;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -26,4 +27,7 @@ public class EditProfileRequest {
 
     @NotNull(message = "Bio can't be null")
     String bio;
+
+    @NotBlank(message = "Allowed to send is required")
+    AllowedToSend allowedToSend;
 }

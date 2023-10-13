@@ -77,10 +77,12 @@ public class ProfileService implements IProfileService {
         profile.setFirstName(editProfileRequest.getFirstName());
         profile.setSurname(editProfileRequest.getSurname());
         profile.setBio(editProfileRequest.getBio());
+        profile.setAllowedToSend(editProfileRequest.getAllowedToSend());
         return profileUtils.toDto(profileRepository.save(profile));
     }
 
     @Override
+    @Transactional
     public void changePassword(Long profileId, String newPassword) throws ResourceNotFoundException {
         Profile profileToChange = profileRepository.findById(profileId).orElseThrow(() -> new ResourceNotFoundException(String.format("User with id %d not found", profileId)));
         profileToChange.setPassword(newPassword);
@@ -88,8 +90,8 @@ public class ProfileService implements IProfileService {
         profileRepository.save(profileToChange);
     }
 
-    @Transactional
     @Override
+    @Transactional
     public void delete(Long profileId) throws ResourceNotFoundException {
         //TODO: Отправить сообщение на почту "Ваш аккаунт был удален, для востановления перейдите по ссылке"
         Profile profileToDelete = profileRepository.findById(profileId).orElseThrow(() -> new ResourceNotFoundException(String.format("User with id %d not found", profileId)));
