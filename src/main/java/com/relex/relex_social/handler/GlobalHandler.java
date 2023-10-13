@@ -1,5 +1,6 @@
 package com.relex.relex_social.handler;
 
+import com.relex.relex_social.dto.response.AppErrorDto;
 import com.relex.relex_social.exception.EmailAlreadyExistsException;
 import com.relex.relex_social.exception.NicknameAlreadyExistsException;
 import com.relex.relex_social.exception.ResourceNotFoundException;
@@ -17,17 +18,20 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
 
 @ControllerAdvice
 @Log
 public class GlobalHandler {
 
+    private ResponseEntity getResponseEntity(Throwable e, HttpStatus httpStatus) {
+        return new ResponseEntity(new AppErrorDto(httpStatus.value(), e.getMessage()), httpStatus);
+    }
+
     @ExceptionHandler(BindException.class)
     protected ResponseEntity<Object> handleBindException(BindException e) {
         List<String> errors = e.getAllErrors().stream()
                 .map(ObjectError::getDefaultMessage)
-                .collect(Collectors.toList());
+                .toList();
         log.log(Level.INFO,
                 String.format("Bind exception in: %s, error count: %d.",
                         Objects.requireNonNull(e.getBindingResult().getTarget()),
@@ -36,32 +40,32 @@ public class GlobalHandler {
     }
 
     @ExceptionHandler(NicknameAlreadyExistsException.class)
-    protected ResponseEntity<String> handleNicknameAlreadyExistsException(NicknameAlreadyExistsException e) {
+    protected ResponseEntity handleNicknameAlreadyExistsException(NicknameAlreadyExistsException e) {
         log.log(Level.INFO, "Attempt to register a profile with an existing nickname", e);
-        return ResponseEntity.badRequest().body("This nickname is already occupied by another user");
+        return getResponseEntity(e, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(EmailAlreadyExistsException.class)
-    protected ResponseEntity<String> handleEmailAlreadyExistsException(EmailAlreadyExistsException e) {
+    protected ResponseEntity handleEmailAlreadyExistsException(EmailAlreadyExistsException e) {
         log.log(Level.INFO, "Attempt to register a profile with an existing E-mail", e);
-        return ResponseEntity.badRequest().body("This E-mail is already occupied by another user");
+        return getResponseEntity(e, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(BadCredentialsException.class)
     protected ResponseEntity handleBadCredentialsException(BadCredentialsException e) {
         log.log(Level.INFO, "Unsuccessful authentication due to invalid login or password", e);
-        return new ResponseEntity("Username or password is not correct", HttpStatus.UNAUTHORIZED);
+        return getResponseEntity(e, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     protected ResponseEntity handleResourceNotFoundExcception(ResourceNotFoundException e) {
         log.log(Level.INFO, "Getting access to a non-existent resource", e);
-        return new ResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
+        return getResponseEntity(e, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     protected ResponseEntity handleAccessDeniedException(AccessDeniedException e) {
         log.log(Level.INFO, "Attempt to access someone else's resource", e);
-        return new ResponseEntity(e.getMessage(), HttpStatus.FORBIDDEN);
+        return getResponseEntity(e, HttpStatus.FORBIDDEN);
     }
 }

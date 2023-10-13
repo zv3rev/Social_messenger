@@ -34,10 +34,10 @@ public class ProfileService implements IProfileService {
     public Long register(CreateProfileRequest request) throws NicknameAlreadyExistsException, EmailAlreadyExistsException {
         Profile profile = profileUtils.toEntity(request);
         if (profileRepository.existsByNickname(profile.getNickname())) {
-            throw new NicknameAlreadyExistsException();
+            throw new NicknameAlreadyExistsException("This nickname is already occupied");
         }
         if (profileRepository.existsByEmail(profile.getEmail())) {
-            throw new EmailAlreadyExistsException();
+            throw new EmailAlreadyExistsException("This email is already occupied");
         }
 
         //TODO: Добавить подтверждение по почте
@@ -63,11 +63,11 @@ public class ProfileService implements IProfileService {
         Profile profile = profileRepository.findById(profileId).orElseThrow(() -> new ResourceNotFoundException(String.format("User with id %d not found", profileId)));
 
         if (!profile.getNickname().equals(editProfileRequest.getNickname()) && profileRepository.existsByNickname(editProfileRequest.getNickname())) {
-            throw new NicknameAlreadyExistsException();
+            throw new NicknameAlreadyExistsException("This nickname is already occupied");
         }
         if (!profile.getEmail().equals(editProfileRequest.getEmail())) {
             if (profileRepository.existsByEmail(editProfileRequest.getEmail())) {
-                throw new EmailAlreadyExistsException();
+                throw new EmailAlreadyExistsException("This email is already occupied");
             }
             //TODO: добавить подтверждение новой почты
         }
