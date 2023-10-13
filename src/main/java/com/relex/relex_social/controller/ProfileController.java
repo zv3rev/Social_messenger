@@ -2,9 +2,6 @@ package com.relex.relex_social.controller;
 
 import com.relex.relex_social.dto.request.CreateProfileRequest;
 import com.relex.relex_social.dto.request.EditProfileRequest;
-import com.relex.relex_social.exception.EmailAlreadyExistsException;
-import com.relex.relex_social.exception.NicknameAlreadyExistsException;
-import com.relex.relex_social.exception.ResourceNotFoundException;
 import com.relex.relex_social.service.interfaces.IAuthService;
 import com.relex.relex_social.service.interfaces.IProfileService;
 import lombok.RequiredArgsConstructor;
@@ -23,11 +20,11 @@ public class ProfileController {
     private final IAuthService authService;
 
     @PostMapping
-    public ResponseEntity registerProfile(@Valid @RequestBody CreateProfileRequest createProfileRequest) throws EmailAlreadyExistsException, NicknameAlreadyExistsException {
+    public ResponseEntity registerProfile(@Valid @RequestBody CreateProfileRequest createProfileRequest) {
         Long createdId = profileService.register(createProfileRequest);
         return ResponseEntity.created(
                         ServletUriComponentsBuilder
-                                .fromCurrentRequest()
+                                .fromCurrentRequestUri()
                                 .path("/{id}")
                                 .buildAndExpand(createdId)
                                 .toUri())
@@ -40,20 +37,20 @@ public class ProfileController {
     }
 
     @PutMapping
-    public ResponseEntity editProfile(@RequestBody EditProfileRequest editProfileRequest) throws ResourceNotFoundException, EmailAlreadyExistsException, NicknameAlreadyExistsException {
+    public ResponseEntity editProfile(@RequestBody EditProfileRequest editProfileRequest) {
         Long profileId = authService.getAuthId();
         return ResponseEntity.ok().body(profileService.edit(profileId, editProfileRequest));
     }
 
     @PatchMapping
-    public ResponseEntity changePassword(@RequestBody String newPassword) throws ResourceNotFoundException {
+    public ResponseEntity changePassword(@RequestBody String newPassword) {
         Long profileId = authService.getAuthId();
         profileService.changePassword(profileId, newPassword);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping
-    public ResponseEntity deleteProfile() throws ResourceNotFoundException {
+    public ResponseEntity deleteProfile() {
         Long profileId = authService.getAuthId();
         profileService.delete(profileId);
 

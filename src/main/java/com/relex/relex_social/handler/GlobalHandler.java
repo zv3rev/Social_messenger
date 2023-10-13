@@ -1,9 +1,7 @@
 package com.relex.relex_social.handler;
 
 import com.relex.relex_social.dto.response.AppErrorDto;
-import com.relex.relex_social.exception.EmailAlreadyExistsException;
-import com.relex.relex_social.exception.NicknameAlreadyExistsException;
-import com.relex.relex_social.exception.ResourceNotFoundException;
+import com.relex.relex_social.exception.*;
 import lombok.extern.java.Log;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -51,6 +49,12 @@ public class GlobalHandler {
         return getResponseEntity(e, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(FriendshipRequestAlreadyExistException.class)
+    protected ResponseEntity handelFriendshipRequestAlreadyExistException(FriendshipRequestAlreadyExistException e){
+        log.log(Level.INFO, "Attempt to send a repeat friendship request", e);
+        return getResponseEntity(e, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(BadCredentialsException.class)
     protected ResponseEntity handleBadCredentialsException(BadCredentialsException e) {
         log.log(Level.INFO, "Unsuccessful authentication due to invalid login or password", e);
@@ -67,5 +71,17 @@ public class GlobalHandler {
     protected ResponseEntity handleAccessDeniedException(AccessDeniedException e) {
         log.log(Level.INFO, "Attempt to access someone else's resource", e);
         return getResponseEntity(e, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(WrongMethodException.class)
+    protected ResponseEntity handleWrongMethodException(WrongMethodException e){
+        log.log(Level.INFO, "Attempt to call a method for an object that is not processed by it", e);
+        return getResponseEntity(e, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    protected ResponseEntity handleIllegalArgumentException(IllegalArgumentException e){
+        log.log(Level.INFO, "A method with unsuitable parameters was called", e);
+        return getResponseEntity(e, HttpStatus.BAD_REQUEST);
     }
 }

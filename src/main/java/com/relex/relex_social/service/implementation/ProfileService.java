@@ -31,7 +31,7 @@ public class ProfileService implements IProfileService {
 
     @Transactional
     @Override
-    public Long register(CreateProfileRequest request) throws NicknameAlreadyExistsException, EmailAlreadyExistsException {
+    public Long register(CreateProfileRequest request) {
         Profile profile = profileUtils.toEntity(request);
         if (profileRepository.existsByNickname(profile.getNickname())) {
             throw new NicknameAlreadyExistsException("This nickname is already occupied");
@@ -59,7 +59,7 @@ public class ProfileService implements IProfileService {
 
     @Transactional
     @Override
-    public ProfileDto edit(Long profileId, EditProfileRequest editProfileRequest) throws ResourceNotFoundException, NicknameAlreadyExistsException, EmailAlreadyExistsException {
+    public ProfileDto edit(Long profileId, EditProfileRequest editProfileRequest) {
         Profile profile = profileRepository.findById(profileId).orElseThrow(() -> new ResourceNotFoundException(String.format("User with id %d not found", profileId)));
 
         if (!profile.getNickname().equals(editProfileRequest.getNickname()) && profileRepository.existsByNickname(editProfileRequest.getNickname())) {

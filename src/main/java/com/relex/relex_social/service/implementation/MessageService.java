@@ -27,7 +27,7 @@ public class MessageService implements IMessageService {
 
     @Override
     @Transactional
-    public Long send(Long senderId, String recipientNickname, SendMessageRequest sendMessageRequest) throws ResourceNotFoundException {
+    public Long send(Long senderId, String recipientNickname, SendMessageRequest sendMessageRequest) {
         Profile recipient = profileRepository.findByNickname(recipientNickname).orElseThrow(() -> new ResourceNotFoundException(String.format("User with nickname %s not found", recipientNickname)));
 
         Message message = Message.builder()
@@ -41,7 +41,7 @@ public class MessageService implements IMessageService {
 
     @Override
     @Transactional
-    public List<MessageDto> getConversation(Long profileId, String chatPartnerNickname) throws ResourceNotFoundException {
+    public List<MessageDto> getConversation(Long profileId, String chatPartnerNickname) {
         Profile chatPartner = profileRepository.findByNickname(chatPartnerNickname).orElseThrow(() -> new ResourceNotFoundException(String.format("User with nickname %s not found", chatPartnerNickname)));
 
         return messageRepository.getMessagesBetweenUsers(profileId, chatPartner.getId()).stream()

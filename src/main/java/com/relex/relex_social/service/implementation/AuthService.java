@@ -31,7 +31,7 @@ public class AuthService implements IAuthService {
 
     @Transactional
     @Override
-    public String createToken(JwtRequest jwtRequest) throws ResourceNotFoundException, AccessToDeletedAccountException {
+    public String createToken(JwtRequest jwtRequest) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(jwtRequest.getUsername(), jwtRequest.getPassword()));
         UserDetails userDetails = profileDetailsService.loadUserByUsername(jwtRequest.getUsername());
         String token = jwtTokenUtils.generateToken(userDetails);

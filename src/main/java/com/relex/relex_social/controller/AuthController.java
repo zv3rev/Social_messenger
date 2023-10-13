@@ -2,7 +2,6 @@ package com.relex.relex_social.controller;
 
 import com.relex.relex_social.dto.request.JwtRequest;
 import com.relex.relex_social.dto.response.JwtResponse;
-import com.relex.relex_social.exception.ResourceNotFoundException;
 import com.relex.relex_social.service.interfaces.IAuthService;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +18,7 @@ public class AuthController {
     private final IAuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity createToken(@RequestBody JwtRequest jwtRequest) throws ResourceNotFoundException {
+    public ResponseEntity createToken(@RequestBody JwtRequest jwtRequest) {
         return ResponseEntity.ok(new JwtResponse(authService.createToken(jwtRequest), ""));
     }
 
