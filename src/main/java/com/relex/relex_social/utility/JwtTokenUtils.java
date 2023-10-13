@@ -29,7 +29,7 @@ public class JwtTokenUtils {
     @Value("${jwt.lifetime}")
     private Duration jwtLifetime;
 
-    public String generateToken(UserDetails userDetails){
+    public String generateToken(UserDetails userDetails) {
         Date issuedDate = new Date();
         Date expiredDate = new Date(issuedDate.getTime() + jwtLifetime.toMillis());
         Map<String, Object> claims = new HashMap<>();
@@ -48,16 +48,17 @@ public class JwtTokenUtils {
                 .compact();
     }
 
-    private Claims getClaims(String token){
+    private Claims getClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(secret.getBytes())
                 .build().parseClaimsJws(token).getBody();
     }
 
-    public String getUsername(String token){
+    public String getUsername(String token) {
         return getClaims(token).getSubject();
     }
-    public List<String> getRoles (String token){
+
+    public List<String> getRoles(String token) {
         return getClaims(token).get("roles", List.class);
     }
 
@@ -71,8 +72,8 @@ public class JwtTokenUtils {
             log.log(Level.INFO, "A token with an incorrect signature was received", e);
             throw new AccessDeniedException("A token with an incorrect signature was received");
         } catch (ExpiredJwtException e) {
-           log.log(Level.INFO, "Expired token received", e);
-           throw new AccessDeniedException("Expired token received");
+            log.log(Level.INFO, "Expired token received", e);
+            throw new AccessDeniedException("Expired token received");
         } catch (Exception e) {
             log.log(Level.INFO, "Unexpected error while validating JWT", e);
             throw new AccessDeniedException("Unexpected error while validating JWT");

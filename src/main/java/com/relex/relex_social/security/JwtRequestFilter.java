@@ -1,6 +1,6 @@
 package com.relex.relex_social.security;
 
-import com.relex.relex_social.service.JwtTokenService;
+import com.relex.relex_social.service.implementation.JwtTokenService;
 import com.relex.relex_social.utility.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;

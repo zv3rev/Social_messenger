@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class MessageUtils {
-    public MessageDto toDto(Message message){
+    public MessageDto toDto(Message message) {
         return new MessageDto(
                 message.getId(),
                 message.getSenderId(),

@@ -1,7 +1,7 @@
 package com.relex.relex_social.configuration;
 
 import com.relex.relex_social.security.JwtRequestFilter;
-import com.relex.relex_social.service.ProfileDetailsService;
+import com.relex.relex_social.service.implementation.ProfileDetailsService;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
@@ -22,7 +22,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true)
 @AllArgsConstructor
-public class WebSecurityConfig{
+public class WebSecurityConfig {
     private final ProfileDetailsService profileDetailsService;
     private final PasswordEncoder passwordEncoder;
     private final JwtRequestFilter jwtRequestFilter;
@@ -32,18 +32,18 @@ public class WebSecurityConfig{
         return httpSecurity
                 .csrf().disable()
                 .authorizeRequests()
-                    .antMatchers("/auth/**","/test/**").permitAll()
-                    .antMatchers(HttpMethod.POST, "/profiles").permitAll()
-                    .antMatchers(HttpMethod.GET, "/profiles").authenticated()
-                    .antMatchers(HttpMethod.PUT, "/profiles/**").authenticated()
-                    .anyRequest().authenticated()
+                .antMatchers("/auth/**", "/test/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/profiles").permitAll()
+                .antMatchers(HttpMethod.GET, "/profiles").authenticated()
+                .antMatchers(HttpMethod.PUT, "/profiles/**").authenticated()
+                .anyRequest().authenticated()
                 .and()
-                    .logout().permitAll()
+                .logout().permitAll()
                 .and()
-                    .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                    .exceptionHandling()
-                    .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                .exceptionHandling()
+                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
                 .and()
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
@@ -52,15 +52,15 @@ public class WebSecurityConfig{
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring()
-                .antMatchers("/v2/api-docs",
-                                        "/configuration/ui",
-                                        "/swagger-resources/**",
-                                        "/configuration/security",
-                                        "/swagger-ui.html",
-                                        "/webjars/**",
-                                        "/swagger-ui/**");
+                .antMatchers(
+                        "/v2/api-docs",
+                        "/configuration/ui",
+                        "/swagger-resources/**",
+                        "/configuration/security",
+                        "/swagger-ui.html",
+                        "/webjars/**",
+                        "/swagger-ui/**");
     }
-
 
 
     @Bean
@@ -69,7 +69,7 @@ public class WebSecurityConfig{
     }
 
     @Bean
-    public DaoAuthenticationProvider daoAuthenticationProvider(){
+    public DaoAuthenticationProvider daoAuthenticationProvider() {
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
         daoAuthenticationProvider.setPasswordEncoder(passwordEncoder);
         daoAuthenticationProvider.setUserDetailsService(profileDetailsService);

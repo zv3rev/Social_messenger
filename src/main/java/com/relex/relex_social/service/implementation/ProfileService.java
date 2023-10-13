@@ -1,4 +1,4 @@
-package com.relex.relex_social.service;
+package com.relex.relex_social.service.implementation;
 
 import com.relex.relex_social.dto.request.CreateProfileRequest;
 import com.relex.relex_social.dto.request.EditProfileRequest;
@@ -9,6 +9,8 @@ import com.relex.relex_social.exception.EmailAlreadyExistsException;
 import com.relex.relex_social.exception.NicknameAlreadyExistsException;
 import com.relex.relex_social.exception.ResourceNotFoundException;
 import com.relex.relex_social.repository.ProfileRepository;
+import com.relex.relex_social.service.interfaces.IJwtTokenService;
+import com.relex.relex_social.service.interfaces.IProfileService;
 import com.relex.relex_social.utility.ProfileUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,19 +23,20 @@ import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
-public class ProfileService{
+public class ProfileService implements IProfileService {
     private final ProfileRepository profileRepository;
     private final PasswordEncoder passwordEncoder;
     private final ProfileUtils profileUtils;
-    private final JwtTokenService jwtTokenService;
+    private final IJwtTokenService jwtTokenService;
 
     @Transactional
+    @Override
     public Long register(CreateProfileRequest request) throws NicknameAlreadyExistsException, EmailAlreadyExistsException {
         Profile profile = profileUtils.toEntity(request);
-        if(profileRepository.existsByNickname(profile.getNickname())){
+        if (profileRepository.existsByNickname(profile.getNickname())) {
             throw new NicknameAlreadyExistsException();
         }
-        if (profileRepository.existsByEmail(profile.getEmail())){
+        if (profileRepository.existsByEmail(profile.getEmail())) {
             throw new EmailAlreadyExistsException();
         }
 
@@ -42,9 +45,10 @@ public class ProfileService{
         return profileRepository.save(profile).getId();
     }
 
-    public List<String> getAllUsernamesAndRealNames(){
+    @Override
+    public List<String> getAllUsernamesAndRealNames() {
         Iterable<Profile> profiles = profileRepository.findAll();
-        return StreamSupport.stream(profiles.spliterator(),false)
+        return StreamSupport.stream(profiles.spliterator(), false)
                 .map((profile) -> String.format("%s %s (%s)", profile.getFirstName(), profile.getSurname(), profile.getNickname()))
                 .collect(Collectors.toList());
     }
@@ -54,27 +58,29 @@ public class ProfileService{
     }
 
     @Transactional
+    @Override
     public ProfileDto edit(Long profileId, EditProfileRequest editProfileRequest) throws ResourceNotFoundException, NicknameAlreadyExistsException, EmailAlreadyExistsException {
-        Profile profileToEdit = profileRepository.findById(profileId).orElseThrow(() -> new ResourceNotFoundException(String.format("User with id %d not found", profileId)));
+        Profile profile = profileRepository.findById(profileId).orElseThrow(() -> new ResourceNotFoundException(String.format("User with id %d not found", profileId)));
 
-        if(!profileToEdit.getNickname().equals(editProfileRequest.getNickname()) && profileRepository.existsByNickname(editProfileRequest.getNickname())){
+        if (!profile.getNickname().equals(editProfileRequest.getNickname()) && profileRepository.existsByNickname(editProfileRequest.getNickname())) {
             throw new NicknameAlreadyExistsException();
         }
-        if (!profileToEdit.getEmail().equals(editProfileRequest.getEmail())){
+        if (!profile.getEmail().equals(editProfileRequest.getEmail())) {
             if (profileRepository.existsByEmail(editProfileRequest.getEmail())) {
                 throw new EmailAlreadyExistsException();
             }
             //TODO: добавить подтверждение новой почты
         }
 
-        profileToEdit.setNickname(editProfileRequest.getNickname());
-        profileToEdit.setEmail(editProfileRequest.getEmail());
-        profileToEdit.setFirstName(editProfileRequest.getFirstName());
-        profileToEdit.setSurname(editProfileRequest.getSurname());
-        profileToEdit.setBio(editProfileRequest.getBio());
-        return profileUtils.toDto(profileRepository.save(profileToEdit));
+        profile.setNickname(editProfileRequest.getNickname());
+        profile.setEmail(editProfileRequest.getEmail());
+        profile.setFirstName(editProfileRequest.getFirstName());
+        profile.setSurname(editProfileRequest.getSurname());
+        profile.setBio(editProfileRequest.getBio());
+        return profileUtils.toDto(profileRepository.save(profile));
     }
 
+    @Override
     public void changePassword(Long profileId, String newPassword) throws ResourceNotFoundException {
         Profile profileToChange = profileRepository.findById(profileId).orElseThrow(() -> new ResourceNotFoundException(String.format("User with id %d not found", profileId)));
         profileToChange.setPassword(newPassword);
@@ -83,6 +89,7 @@ public class ProfileService{
     }
 
     @Transactional
+    @Override
     public void delete(Long profileId) throws ResourceNotFoundException {
         //TODO: Отправить сообщение на почту "Ваш аккаунт был удален, для востановления перейдите по ссылке"
         Profile profileToDelete = profileRepository.findById(profileId).orElseThrow(() -> new ResourceNotFoundException(String.format("User with id %d not found", profileId)));

@@ -1,18 +1,20 @@
-package com.relex.relex_social.service;
+package com.relex.relex_social.service.implementation;
 
 import com.relex.relex_social.entity.JwtToken;
 import com.relex.relex_social.repository.JwtTokenRepository;
+import com.relex.relex_social.service.interfaces.IJwtTokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class JwtTokenService {
+public class JwtTokenService implements IJwtTokenService {
     private final JwtTokenRepository jwtTokenRepository;
 
     @Transactional
-    public void registerToken(Long profileId, String token){
+    @Override
+    public void registerToken(Long profileId, String token) {
         jwtTokenRepository.deleteByProfileId(profileId);
 
         JwtToken jwtToken = JwtToken.builder()
@@ -23,11 +25,13 @@ public class JwtTokenService {
         jwtTokenRepository.save(jwtToken);
     }
 
-    public boolean isTokenValid(String token){
+    @Override
+    public boolean isTokenValid(String token) {
         return jwtTokenRepository.existsByToken(token);
     }
 
-    public void invalidToken(Long profileId){
+    @Override
+    public void invalidToken(Long profileId) {
         jwtTokenRepository.deleteByProfileId(profileId);
     }
 }

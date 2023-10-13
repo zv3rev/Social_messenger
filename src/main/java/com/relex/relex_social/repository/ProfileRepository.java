@@ -7,9 +7,11 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface ProfileRepository extends CrudRepository<Profile,Long> {
+public interface ProfileRepository extends CrudRepository<Profile, Long> {
     Optional<Profile> findByNickname(String nickname);
+
     Boolean existsByNickname(String string);
+
     Boolean existsByEmail(String email);
 
 }

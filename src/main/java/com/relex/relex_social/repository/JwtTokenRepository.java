@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface JwtTokenRepository extends CrudRepository<JwtToken, Long> {
     void deleteByProfileId(Long profileId);
+
     boolean existsByToken(String token);
-    void deleteByToken(String token);
 }

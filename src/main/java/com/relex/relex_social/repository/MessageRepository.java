@@ -13,9 +13,9 @@ public interface MessageRepository extends CrudRepository<Message, Long> {
 
     String SELECT_MESSAGES_BETWEEN_USERS_QUERY =
             "SELECT m FROM Message m " +
-            "WHERE m.senderId = :id1 AND m.recipientId = :id2 OR " +
+                    "WHERE m.senderId = :id1 AND m.recipientId = :id2 OR " +
                     "m.senderId = :id2 AND m.recipientId = :id1 " +
-            "ORDER BY m.sendTime";
+                    "ORDER BY m.sendTime";
 
     @Query(SELECT_MESSAGES_BETWEEN_USERS_QUERY)
     List<Message> getMessagesBetweenUsers(@Param("id1") Long id1, @Param("id2") Long id2);

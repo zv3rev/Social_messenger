@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ProfileUtils {
-    public Profile toEntity(CreateProfileRequest request){
+    public Profile toEntity(CreateProfileRequest request) {
         return Profile.builder()
                 .nickname(request.getNickname())
                 .password(request.getPassword())
@@ -20,7 +20,7 @@ public class ProfileUtils {
                 .build();
     }
 
-    public ProfileDto toDto(Profile profile){
+    public ProfileDto toDto(Profile profile) {
         return new ProfileDto(
                 profile.getId(),
                 profile.getEmail(),

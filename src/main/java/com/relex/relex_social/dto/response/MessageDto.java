@@ -2,6 +2,7 @@ package com.relex.relex_social.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+
 import java.sql.Timestamp;
 
 @AllArgsConstructor

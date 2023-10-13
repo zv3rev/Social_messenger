@@ -1,12 +1,12 @@
 package com.relex.relex_social.entity;
 
 public enum ProfileStatus {
-    UNCONFIRMED ("UNCONFIRMED"),
+    UNCONFIRMED("UNCONFIRMED"),
     CONFIRMED("CONFIRMED"),
-    DELETED("DELETED")
-    ;
+    DELETED("DELETED");
 
     private final String name;
+
     ProfileStatus(String name) {
         this.name = name;
     }
