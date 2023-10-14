@@ -1,4 +1,4 @@
-package com.relex.relex_social.repository;
+package com.relex.relex_social.converter;
 
 import com.relex.relex_social.entity.ProfileStatus;
 

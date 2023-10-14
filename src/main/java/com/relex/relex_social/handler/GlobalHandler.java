@@ -7,12 +7,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-
-
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -89,5 +88,11 @@ public class GlobalHandler {
     protected ResponseEntity handleSendingRestrictionException(SendingRestrictionException e){
         log.log(Level.INFO, "Attempt to send a message to a user with a sending restriction", e);
         return getResponseEntity(e, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    protected ResponseEntity handleAuthenticationException(AuthenticationException e){
+        log.log(Level.INFO, "Access attempt by an un-authenticated user", e);
+        return getResponseEntity(e, HttpStatus.UNAUTHORIZED);
     }
 }
