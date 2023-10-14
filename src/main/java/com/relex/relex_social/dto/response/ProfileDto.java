@@ -16,4 +16,5 @@ public class ProfileDto {
     String bio;
     ProfileStatus status;
     AllowedToSend allowedToSend;
+    Boolean isFriendsListVisible;
 }

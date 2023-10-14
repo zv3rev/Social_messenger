@@ -6,8 +6,8 @@ import com.relex.relex_social.dto.response.ProfileDto;
 import java.util.List;
 
 public interface IFriendshipService {
-    List<ProfileDto> getFriendsList(Long profileId);
-
+    List<ProfileDto> getFriendsListWithVisibilityCheck(Long profileId);
+    List<ProfileDto> getFriendsListWithoutVisibilityCheck(Long profileId);
     FriendshipDto sendRequest(Long profileId, Long friendId);
 
     List<FriendshipDto> getProfileRequests(Long profileId);

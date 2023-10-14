@@ -21,7 +21,12 @@ public class FriendshipController {
     @GetMapping
     public ResponseEntity getFriends() {
         Long profileId = authService.getAuthId();
-        return ResponseEntity.ok(friendshipService.getFriendsList(profileId));
+        return ResponseEntity.ok(friendshipService.getFriendsListWithoutVisibilityCheck(profileId));
+    }
+
+    @GetMapping("/{userId}")
+    public ResponseEntity getUserFriends(@PathVariable Long userId){
+        return ResponseEntity.ok(friendshipService.getFriendsListWithVisibilityCheck(userId));
     }
 
     @DeleteMapping("/{friendId}")
@@ -65,7 +70,6 @@ public class FriendshipController {
         return ResponseEntity.ok(incomingRequests);
     }
 
-    //TODO: норм ли использовать bool в параметрах
     @PatchMapping("/responses/{requestId}")
     public ResponseEntity replyToRequest(@PathVariable Long requestId, @RequestParam Boolean isApproved) {
         Long profileId = authService.getAuthId();

@@ -28,6 +28,9 @@ public class EditProfileRequest {
     @NotNull(message = "Bio can't be null")
     String bio;
 
-    @NotBlank(message = "Allowed to send is required")
+    @NotNull(message = "Allowed to send is required")
     AllowedToSend allowedToSend;
+
+    @NotNull(message = "Visibility of friends list required")
+    Boolean isFriendsListVisible;
 }

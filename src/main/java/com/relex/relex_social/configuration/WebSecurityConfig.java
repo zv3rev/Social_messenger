@@ -34,10 +34,9 @@ public class WebSecurityConfig {
         return httpSecurity
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/auth/**", "/test/**").permitAll()
+                .antMatchers("/auth/**").permitAll()
                 .antMatchers(HttpMethod.POST, "/profiles").permitAll()
-                .antMatchers(HttpMethod.GET, "/profiles").authenticated()
-                .antMatchers(HttpMethod.PUT, "/profiles/**").authenticated()
+                .antMatchers(HttpMethod.GET,"/friends/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .logout().permitAll()

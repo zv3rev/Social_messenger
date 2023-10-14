@@ -25,4 +25,5 @@ public class Profile {
     String bio;
     ProfileStatus profileStatus;
     AllowedToSend allowedToSend;
+    Boolean isFriendsListVisible;
 }

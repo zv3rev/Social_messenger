@@ -32,13 +32,25 @@ public class FriendshipService implements IFriendshipService {
     private final ProfileUtils profileUtils;
     private final FriendshipUtils friendshipUtils;
 
+
     @Override
-    @Transactional
-    public List<ProfileDto> getFriendsList(Long profileId) {
-        List<Long> friendsId = friendshipRepository.getFriends(profileId);
-        Iterable<Profile> friends = profileRepository.findAllById(friendsId);
-        return StreamSupport.stream(friends.spliterator(), false)
-                .map(profileUtils::toDto).toList();
+    public List<ProfileDto> getFriendsListWithVisibilityCheck(Long profileId) {
+        Profile profile = profileRepository.findById(profileId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("User with  id %d wasn't found", profileId)));
+        if (!profile.getIsFriendsListVisible()) {
+            throw new AccessDeniedException("The user has closed access to the friends list");
+        }
+
+        return getFriendsList(profileId).stream()
+                .map(profileUtils::toDto)
+                .toList();
+    }
+
+    @Override
+    public List<ProfileDto> getFriendsListWithoutVisibilityCheck(Long profileId) {
+        return getFriendsList(profileId).stream()
+                .map(profileUtils::toDto)
+                .toList();
     }
 
     @Override
@@ -52,7 +64,7 @@ public class FriendshipService implements IFriendshipService {
             throw new FriendshipRequestAlreadyExistException(String.format("You're already friends or have sent friendship request to user with id %d", friendId));
         }
 
-        if (profileId.equals(friendId)){
+        if (profileId.equals(friendId)) {
             throw new IllegalArgumentException("You can not add yourself in friends");
         }
 
@@ -119,11 +131,16 @@ public class FriendshipService implements IFriendshipService {
 
     @Override
     public void removeFriend(Long profileId, Long friendId) {
-        Optional<Friendship> friendship = friendshipRepository.getFriendshipBetweenUsers(profileId, friendId);
-        if (friendship.isEmpty()) {
-            throw new ResourceNotFoundException(String.format("You are not friends with id %d", friendId));
-        }
+        Friendship friendship = friendshipRepository.getFriendshipBetweenUsers(profileId, friendId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("You are not friends with id %d", friendId)));
 
-        friendshipRepository.deleteById(friendship.get().getId());
+        friendshipRepository.deleteById(friendship.getId());
+    }
+
+    private List<Profile> getFriendsList(Long profileId) {
+        List<Long> friendsId = friendshipRepository.getFriends(profileId);
+        Iterable<Profile> friends = profileRepository.findAllById(friendsId);
+        return StreamSupport.stream(friends.spliterator(), false)
+                .toList();
     }
 }

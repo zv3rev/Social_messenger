@@ -9,6 +9,7 @@ CREATE TABLE profile
     bio text,
     profile_status text NOT NULL DEFAULT 'UNCONFIRMED'::text,
     allowed_to_send text NOT NULL DEFAULT 'ALL'::text,
+    is_friends_list_visible bool NOT NULL DEFAULT true,
 
     CONSTRAINT profile_id_pk PRIMARY KEY (id),
     CONSTRAINT profile_email_u UNIQUE (email),

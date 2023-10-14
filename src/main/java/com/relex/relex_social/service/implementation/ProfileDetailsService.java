@@ -1,6 +1,8 @@
 package com.relex.relex_social.service.implementation;
 
 import com.relex.relex_social.entity.Profile;
+import com.relex.relex_social.entity.ProfileStatus;
+import com.relex.relex_social.exception.ResourceNotFoundException;
 import com.relex.relex_social.repository.ProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -20,6 +22,11 @@ public class ProfileDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) {
         Profile profile = profileRepository.findByNickname(username).orElseThrow(() -> new UsernameNotFoundException("No user with this username"));
+
+        if (profile.getProfileStatus() == ProfileStatus.DELETED){
+            throw new ResourceNotFoundException("This account is deleted");
+        }
+
         return new User(
                 profile.getNickname(),
                 profile.getPassword(),

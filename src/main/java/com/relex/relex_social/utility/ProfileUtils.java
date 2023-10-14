@@ -19,6 +19,7 @@ public class ProfileUtils {
                 .bio(request.getBio())
                 .profileStatus(ProfileStatus.UNCONFIRMED)
                 .allowedToSend(AllowedToSend.ALL)
+                .isFriendsListVisible(true)
                 .build();
     }
 
@@ -31,6 +32,7 @@ public class ProfileUtils {
                 profile.getSurname(),
                 profile.getBio(),
                 profile.getProfileStatus(),
-                profile.getAllowedToSend());
+                profile.getAllowedToSend(),
+                profile.getIsFriendsListVisible());
     }
 }

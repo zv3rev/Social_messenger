@@ -78,6 +78,7 @@ public class ProfileService implements IProfileService {
         profile.setSurname(editProfileRequest.getSurname());
         profile.setBio(editProfileRequest.getBio());
         profile.setAllowedToSend(editProfileRequest.getAllowedToSend());
+        profile.setIsFriendsListVisible(editProfileRequest.getIsFriendsListVisible());
         return profileUtils.toDto(profileRepository.save(profile));
     }
 
