@@ -9,11 +9,13 @@ import java.util.List;
 public interface IProfileService {
     Long register(CreateProfileRequest request);
 
-    List<String> getAllUsernamesAndRealNames();
+    List<ProfileDto> getAllUsers();
 
     ProfileDto edit(Long profileId, EditProfileRequest editProfileRequest);
 
     void changePassword(Long profileId, String newPassword);
 
     void delete(Long profileId);
+
+    void restore(String nickname);
 }

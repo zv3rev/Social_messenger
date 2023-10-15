@@ -1,8 +1,7 @@
 package com.relex.relex_social.entity;
 
 public enum ProfileStatus {
-    UNCONFIRMED("UNCONFIRMED"),
-    CONFIRMED("CONFIRMED"),
+    ACTIVE("ACTIVE"),
     DELETED("DELETED");
 
     private final String name;

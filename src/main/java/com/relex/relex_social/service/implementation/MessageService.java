@@ -33,9 +33,11 @@ public class MessageService implements IMessageService {
     @Override
     @Transactional
     public Long send(Long senderId, String recipientNickname, SendMessageRequest sendMessageRequest) {
-        Profile recipient = profileRepository.findByNickname(recipientNickname).orElseThrow(() -> new ResourceNotFoundException(String.format("User with nickname %s not found", recipientNickname)));
+        Profile recipient = profileRepository.findByNickname(recipientNickname)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("User with nickname %s not found", recipientNickname)));
         List<Long> recipientFriendIds = friendshipService.getFriendsListWithoutVisibilityCheck(recipient.getId()).stream()
-                .map(ProfileDto::getId).toList();
+                .map(ProfileDto::getId)
+                .toList();
 
         if (recipient.getAllowedToSend() == AllowedToSend.NONE){
             throw new SendingRestrictionException("The user has disabled receiving messages");

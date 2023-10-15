@@ -19,7 +19,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity createToken(@RequestBody JwtRequest jwtRequest) {
-        return ResponseEntity.ok(new JwtResponse(authService.createToken(jwtRequest), ""));
+        return ResponseEntity.ok(new JwtResponse(authService.createToken(jwtRequest)));
     }
 
     @DeleteMapping("/logout")

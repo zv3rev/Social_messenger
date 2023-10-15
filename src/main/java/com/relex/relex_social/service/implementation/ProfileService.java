@@ -7,23 +7,29 @@ import com.relex.relex_social.entity.Profile;
 import com.relex.relex_social.entity.ProfileStatus;
 import com.relex.relex_social.exception.EmailAlreadyExistsException;
 import com.relex.relex_social.exception.NicknameAlreadyExistsException;
+import com.relex.relex_social.exception.PermanentlyDeletedAccountException;
 import com.relex.relex_social.exception.ResourceNotFoundException;
 import com.relex.relex_social.repository.ProfileRepository;
 import com.relex.relex_social.service.interfaces.IJwtTokenService;
 import com.relex.relex_social.service.interfaces.IProfileService;
 import com.relex.relex_social.utility.ProfileUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
+import java.time.Duration;
+import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
 public class ProfileService implements IProfileService {
+    @Value("${profile.timeToRestore}")
+    private Duration timeToRestore;
     private final ProfileRepository profileRepository;
     private final PasswordEncoder passwordEncoder;
     private final ProfileUtils profileUtils;
@@ -46,11 +52,11 @@ public class ProfileService implements IProfileService {
     }
 
     @Override
-    public List<String> getAllUsernamesAndRealNames() {
+    public List<ProfileDto> getAllUsers() {
         Iterable<Profile> profiles = profileRepository.findAll();
         return StreamSupport.stream(profiles.spliterator(), false)
-                .map((profile) -> String.format("%s %s (%s)", profile.getFirstName(), profile.getSurname(), profile.getNickname()))
-                .collect(Collectors.toList());
+                .map(profileUtils::toDto)
+                .toList();
     }
 
     private void encodeProfilePassword(Profile profile) {
@@ -60,7 +66,8 @@ public class ProfileService implements IProfileService {
     @Transactional
     @Override
     public ProfileDto edit(Long profileId, EditProfileRequest editProfileRequest) {
-        Profile profile = profileRepository.findById(profileId).orElseThrow(() -> new ResourceNotFoundException(String.format("User with id %d not found", profileId)));
+        Profile profile = profileRepository.findById(profileId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("User with id %d not found", profileId)));
 
         if (!profile.getNickname().equals(editProfileRequest.getNickname()) && profileRepository.existsByNickname(editProfileRequest.getNickname())) {
             throw new NicknameAlreadyExistsException("This nickname is already occupied");
@@ -85,7 +92,8 @@ public class ProfileService implements IProfileService {
     @Override
     @Transactional
     public void changePassword(Long profileId, String newPassword) throws ResourceNotFoundException {
-        Profile profileToChange = profileRepository.findById(profileId).orElseThrow(() -> new ResourceNotFoundException(String.format("User with id %d not found", profileId)));
+        Profile profileToChange = profileRepository.findById(profileId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("User with id %d not found", profileId)));
         profileToChange.setPassword(newPassword);
         encodeProfilePassword(profileToChange);
         profileRepository.save(profileToChange);
@@ -95,9 +103,25 @@ public class ProfileService implements IProfileService {
     @Transactional
     public void delete(Long profileId) throws ResourceNotFoundException {
         //TODO: Отправить сообщение на почту "Ваш аккаунт был удален, для востановления перейдите по ссылке"
-        Profile profileToDelete = profileRepository.findById(profileId).orElseThrow(() -> new ResourceNotFoundException(String.format("User with id %d not found", profileId)));
+        Profile profileToDelete = profileRepository.findById(profileId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("User with id %d not found", profileId)));
         profileToDelete.setProfileStatus(ProfileStatus.DELETED);
+        profileToDelete.setDeleteDate(new Timestamp(new Date().getTime()));
         profileRepository.save(profileToDelete);
         jwtTokenService.invalidToken(profileId);
+    }
+
+    @Override
+    public void restore(String nickname) {
+        Profile profileToRestore = profileRepository.findByNickname(nickname)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("User with nickname %s not found", nickname)));
+        Timestamp endOfRestoration = new Timestamp(profileToRestore.getDeleteDate().getTime() + timeToRestore.toMillis());
+
+        if (endOfRestoration.before(new Timestamp(new Date().getTime()))){
+            throw new PermanentlyDeletedAccountException("Account recovery time has expired");
+        }
+
+        profileToRestore.setProfileStatus(ProfileStatus.ACTIVE);
+        profileRepository.save(profileToRestore);
     }
 }

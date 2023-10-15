@@ -95,4 +95,10 @@ public class GlobalHandler {
         log.log(Level.INFO, "Access attempt by an un-authenticated user", e);
         return getResponseEntity(e, HttpStatus.UNAUTHORIZED);
     }
+
+    @ExceptionHandler(PermanentlyDeletedAccountException.class)
+    protected ResponseEntity handlePermanentlyDeletedAccountException(PermanentlyDeletedAccountException e){
+        log.log(Level.INFO, "Attempt to restore permanently deleted account", e);
+        return getResponseEntity(e, HttpStatus.BAD_REQUEST);
+    }
 }

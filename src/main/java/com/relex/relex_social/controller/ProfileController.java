@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequestMapping("/profiles")
@@ -32,8 +31,8 @@ public class ProfileController {
     }
 
     @GetMapping
-    public ResponseEntity<List<String>> getAllUsers() {
-        return ResponseEntity.ok().body(profileService.getAllUsernamesAndRealNames());
+    public ResponseEntity getAllUsers() {
+        return ResponseEntity.ok().body(profileService.getAllUsers());
     }
 
     @PutMapping
@@ -55,5 +54,11 @@ public class ProfileController {
         profileService.delete(profileId);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/restore/{nickname}")
+    public ResponseEntity restoreProfile(@PathVariable String nickname){
+        profileService.restore(nickname);
+        return ResponseEntity.ok().build();
     }
 }

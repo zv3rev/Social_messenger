@@ -3,7 +3,6 @@ package com.relex.relex_social.configuration;
 import com.relex.relex_social.security.JwtRequestFilter;
 import com.relex.relex_social.service.implementation.ProfileDetailsService;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,8 +25,7 @@ public class WebSecurityConfig {
     private final ProfileDetailsService profileDetailsService;
     private final PasswordEncoder passwordEncoder;
     private final JwtRequestFilter jwtRequestFilter;
-    @Qualifier("customEntryPoint")
-    private AuthenticationEntryPoint authenticationEntryPoint;
+    private AuthenticationEntryPoint customEntryPoint;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -37,6 +35,7 @@ public class WebSecurityConfig {
                 .antMatchers("/auth/**").permitAll()
                 .antMatchers(HttpMethod.POST, "/profiles").permitAll()
                 .antMatchers(HttpMethod.GET,"/friends/**").permitAll()
+                .antMatchers(HttpMethod.PATCH, "/profiles/restore/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .logout().permitAll()
@@ -44,7 +43,7 @@ public class WebSecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .exceptionHandling()
-                .authenticationEntryPoint(authenticationEntryPoint)
+                .authenticationEntryPoint(customEntryPoint)
                 .and()
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
