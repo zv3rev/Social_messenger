@@ -34,6 +34,7 @@ public class WebSecurityConfig {
                 .authorizeRequests()
                 .antMatchers("/auth/login").permitAll()
                 .antMatchers(HttpMethod.POST, "/profiles").permitAll()
+                .antMatchers(HttpMethod.GET,"/profiles").permitAll()
                 .antMatchers(HttpMethod.GET, "/friends").authenticated()
                 .antMatchers(HttpMethod.GET, "/friends/**").permitAll()
                 .antMatchers(HttpMethod.PATCH, "/profiles/restore/**").permitAll()
