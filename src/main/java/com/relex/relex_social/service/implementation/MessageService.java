@@ -39,10 +39,10 @@ public class MessageService implements IMessageService {
                 .map(ProfileDto::getId)
                 .toList();
 
-        if (recipient.getAllowedToSend() == AllowedToSend.NONE){
+        if (recipient.getAllowedToSend() == AllowedToSend.NONE) {
             throw new SendingRestrictionException("The user has disabled receiving messages");
         }
-        if (!recipientFriendIds.contains(senderId) && recipient.getAllowedToSend() == AllowedToSend.FRIENDS){
+        if (!recipientFriendIds.contains(senderId) && recipient.getAllowedToSend() == AllowedToSend.FRIENDS) {
             throw new SendingRestrictionException("The user has restricted receiving messages only from friends");
         }
 

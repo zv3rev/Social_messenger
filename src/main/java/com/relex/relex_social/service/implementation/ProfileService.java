@@ -28,12 +28,12 @@ import java.util.stream.StreamSupport;
 @Service
 @RequiredArgsConstructor
 public class ProfileService implements IProfileService {
-    @Value("${profile.timeToRestore}")
-    private Duration timeToRestore;
     private final ProfileRepository profileRepository;
     private final PasswordEncoder passwordEncoder;
     private final ProfileUtils profileUtils;
     private final IJwtTokenService jwtTokenService;
+    @Value("${profile.timeToRestore}")
+    private Duration timeToRestore;
 
     @Transactional
     @Override
@@ -46,7 +46,7 @@ public class ProfileService implements IProfileService {
             throw new EmailAlreadyExistsException("This email is already occupied");
         }
 
-        //TODO: Добавить подтверждение по почте
+
         encodeProfilePassword(profile);
         return profileRepository.save(profile).getId();
     }
@@ -72,11 +72,8 @@ public class ProfileService implements IProfileService {
         if (!profile.getNickname().equals(editProfileRequest.getNickname()) && profileRepository.existsByNickname(editProfileRequest.getNickname())) {
             throw new NicknameAlreadyExistsException("This nickname is already occupied");
         }
-        if (!profile.getEmail().equals(editProfileRequest.getEmail())) {
-            if (profileRepository.existsByEmail(editProfileRequest.getEmail())) {
+        if (!profile.getEmail().equals(editProfileRequest.getEmail()) && profileRepository.existsByEmail(editProfileRequest.getEmail())) {
                 throw new EmailAlreadyExistsException("This email is already occupied");
-            }
-            //TODO: добавить подтверждение новой почты
         }
 
         profile.setNickname(editProfileRequest.getNickname());
@@ -102,7 +99,6 @@ public class ProfileService implements IProfileService {
     @Override
     @Transactional
     public void delete(Long profileId) throws ResourceNotFoundException {
-        //TODO: Отправить сообщение на почту "Ваш аккаунт был удален, для востановления перейдите по ссылке"
         Profile profileToDelete = profileRepository.findById(profileId)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("User with id %d not found", profileId)));
         profileToDelete.setProfileStatus(ProfileStatus.DELETED);
@@ -117,7 +113,7 @@ public class ProfileService implements IProfileService {
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("User with nickname %s not found", nickname)));
         Timestamp endOfRestoration = new Timestamp(profileToRestore.getDeleteDate().getTime() + timeToRestore.toMillis());
 
-        if (endOfRestoration.before(new Timestamp(new Date().getTime()))){
+        if (endOfRestoration.before(new Timestamp(new Date().getTime()))) {
             throw new PermanentlyDeletedAccountException("Account recovery time has expired");
         }
 

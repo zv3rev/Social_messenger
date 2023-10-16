@@ -25,7 +25,7 @@ public class FriendshipController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity getUserFriends(@PathVariable Long userId){
+    public ResponseEntity getUserFriends(@PathVariable Long userId) {
         return ResponseEntity.ok(friendshipService.getFriendsListWithVisibilityCheck(userId));
     }
 
@@ -33,7 +33,7 @@ public class FriendshipController {
     public ResponseEntity removeFriend(@PathVariable Long friendId) {
         Long profileId = authService.getAuthId();
         friendshipService.removeFriend(profileId, friendId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/requests")
@@ -63,14 +63,14 @@ public class FriendshipController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/responses")
+    @GetMapping("/incoming")
     public ResponseEntity getIncomingRequests() {
         Long profileId = authService.getAuthId();
         List<FriendshipDto> incomingRequests = friendshipService.getIncomingRequests(profileId);
         return ResponseEntity.ok(incomingRequests);
     }
 
-    @PatchMapping("/responses/{requestId}")
+    @PatchMapping("/incoming/{requestId}")
     public ResponseEntity replyToRequest(@PathVariable Long requestId, @RequestParam Boolean isApproved) {
         Long profileId = authService.getAuthId();
         friendshipService.replyToRequest(profileId, requestId, isApproved);

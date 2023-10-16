@@ -1,6 +1,6 @@
 CREATE TABLE friendship
 (
-    id bigint NOT NULL,
+    id bigserial NOT NULL,
     sender_id bigint NOT NULL,
     recipient_id bigint NOT NULL,
     request_date timestamp without time zone NOT NULL,

@@ -120,6 +120,9 @@ public class FriendshipService implements IFriendshipService {
         if (!friendship.getRecipientId().equals(profileId)) {
             throw new AccessDeniedException("This request does not belong to you");
         }
+        if (friendship.getApprovedDate() != null || friendship.getDeniedDate() != null) {
+            throw new IllegalArgumentException("This request has already been answered");
+        }
 
         if (isApproved) {
             friendship.setApprovedDate(new Timestamp(new Date().getTime()));
@@ -132,7 +135,7 @@ public class FriendshipService implements IFriendshipService {
     @Override
     public void removeFriend(Long profileId, Long friendId) {
         Friendship friendship = friendshipRepository.getFriendshipBetweenUsers(profileId, friendId)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("You are not friends with id %d", friendId)));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("You have not friend with id %d", friendId)));
 
         friendshipRepository.deleteById(friendship.getId());
     }

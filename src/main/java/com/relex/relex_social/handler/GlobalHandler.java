@@ -12,6 +12,7 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -49,7 +50,7 @@ public class GlobalHandler {
     }
 
     @ExceptionHandler(FriendshipRequestAlreadyExistException.class)
-    protected ResponseEntity handelFriendshipRequestAlreadyExistException(FriendshipRequestAlreadyExistException e){
+    protected ResponseEntity handelFriendshipRequestAlreadyExistException(FriendshipRequestAlreadyExistException e) {
         log.log(Level.INFO, "Attempt to send a repeat friendship request", e);
         return getResponseEntity(e, HttpStatus.BAD_REQUEST);
     }
@@ -57,7 +58,7 @@ public class GlobalHandler {
     @ExceptionHandler(BadCredentialsException.class)
     protected ResponseEntity handleBadCredentialsException(BadCredentialsException e) {
         log.log(Level.INFO, "Unsuccessful authentication due to invalid login or password", e);
-        return getResponseEntity(e, HttpStatus.UNAUTHORIZED);
+        return getResponseEntity(e, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
@@ -73,31 +74,31 @@ public class GlobalHandler {
     }
 
     @ExceptionHandler(WrongMethodException.class)
-    protected ResponseEntity handleWrongMethodException(WrongMethodException e){
+    protected ResponseEntity handleWrongMethodException(WrongMethodException e) {
         log.log(Level.INFO, "Attempt to call a method for an object that is not processed by it", e);
         return getResponseEntity(e, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    protected ResponseEntity handleIllegalArgumentException(IllegalArgumentException e){
+    protected ResponseEntity handleIllegalArgumentException(IllegalArgumentException e) {
         log.log(Level.INFO, "A method with unsuitable parameters was called", e);
         return getResponseEntity(e, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(SendingRestrictionException.class)
-    protected ResponseEntity handleSendingRestrictionException(SendingRestrictionException e){
+    protected ResponseEntity handleSendingRestrictionException(SendingRestrictionException e) {
         log.log(Level.INFO, "Attempt to send a message to a user with a sending restriction", e);
         return getResponseEntity(e, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(AuthenticationException.class)
-    protected ResponseEntity handleAuthenticationException(AuthenticationException e){
+    protected ResponseEntity handleAuthenticationException(AuthenticationException e) {
         log.log(Level.INFO, "Access attempt by an un-authenticated user", e);
         return getResponseEntity(e, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(PermanentlyDeletedAccountException.class)
-    protected ResponseEntity handlePermanentlyDeletedAccountException(PermanentlyDeletedAccountException e){
+    protected ResponseEntity handlePermanentlyDeletedAccountException(PermanentlyDeletedAccountException e) {
         log.log(Level.INFO, "Attempt to restore permanently deleted account", e);
         return getResponseEntity(e, HttpStatus.BAD_REQUEST);
     }

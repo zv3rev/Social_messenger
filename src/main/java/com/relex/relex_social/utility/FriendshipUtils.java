@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class FriendshipUtils {
-    public FriendshipDto toDto(Friendship friendship){
+    public FriendshipDto toDto(Friendship friendship) {
         return new FriendshipDto(
                 friendship.getId(),
                 friendship.getSenderId(),

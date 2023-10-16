@@ -21,9 +21,10 @@ public class ProfileDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) {
-        Profile profile = profileRepository.findByNickname(username).orElseThrow(() -> new UsernameNotFoundException("No user with this username"));
+        Profile profile = profileRepository.findByNickname(username)
+                .orElseThrow(() -> new UsernameNotFoundException("No user with this username"));
 
-        if (profile.getProfileStatus() == ProfileStatus.DELETED){
+        if (profile.getProfileStatus() == ProfileStatus.DELETED) {
             throw new ResourceNotFoundException("This account is deleted");
         }
 

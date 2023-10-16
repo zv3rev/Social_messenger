@@ -1,5 +1,6 @@
 package com.relex.relex_social.controller;
 
+import com.relex.relex_social.dto.request.ChangePasswordRequest;
 import com.relex.relex_social.dto.request.CreateProfileRequest;
 import com.relex.relex_social.dto.request.EditProfileRequest;
 import com.relex.relex_social.service.interfaces.IAuthService;
@@ -42,9 +43,9 @@ public class ProfileController {
     }
 
     @PatchMapping
-    public ResponseEntity changePassword(@RequestBody String newPassword) {
+    public ResponseEntity changePassword(@RequestBody @Valid ChangePasswordRequest changePasswordRequest) {
         Long profileId = authService.getAuthId();
-        profileService.changePassword(profileId, newPassword);
+        profileService.changePassword(profileId, changePasswordRequest.getNewPassword());
         return ResponseEntity.ok().build();
     }
 
@@ -57,7 +58,7 @@ public class ProfileController {
     }
 
     @PatchMapping("/restore/{nickname}")
-    public ResponseEntity restoreProfile(@PathVariable String nickname){
+    public ResponseEntity restoreProfile(@PathVariable String nickname) {
         profileService.restore(nickname);
         return ResponseEntity.ok().build();
     }

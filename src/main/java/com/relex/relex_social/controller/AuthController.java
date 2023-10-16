@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth")
@@ -18,7 +20,7 @@ public class AuthController {
     private final IAuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity createToken(@RequestBody JwtRequest jwtRequest) {
+    public ResponseEntity createToken(@RequestBody @Valid JwtRequest jwtRequest) {
         return ResponseEntity.ok(new JwtResponse(authService.createToken(jwtRequest)));
     }
 

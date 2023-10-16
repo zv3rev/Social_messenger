@@ -10,7 +10,6 @@ import com.relex.relex_social.service.interfaces.IAuthService;
 import com.relex.relex_social.service.interfaces.IJwtTokenService;
 import com.relex.relex_social.utility.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -35,7 +34,8 @@ public class AuthService implements IAuthService {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(jwtRequest.getUsername(), jwtRequest.getPassword()));
         UserDetails userDetails = profileDetailsService.loadUserByUsername(jwtRequest.getUsername());
         String token = jwtTokenUtils.generateToken(userDetails);
-        Profile profile = profileRepository.findByNickname(jwtRequest.getUsername()).orElseThrow(() -> new ResourceNotFoundException("User wasn't found"));
+        Profile profile = profileRepository.findByNickname(jwtRequest.getUsername())
+                .orElseThrow(() -> new ResourceNotFoundException("User wasn't found"));
         if (profile.getProfileStatus().equals(ProfileStatus.DELETED)) {
             throw new AccessToDeletedAccountException("You can not get access to deleted account");
         }
@@ -49,14 +49,15 @@ public class AuthService implements IAuthService {
         if (auth == null) {
             return null;
         }
-        return profileRepository.findByNickname(auth.getPrincipal().toString()).orElse(null);
+        return profileRepository.findByNickname(auth.getPrincipal().toString())
+                .orElseThrow(() -> new ResourceNotFoundException("User with this JWT wasn't found"));
     }
 
     @Override
     public Long getAuthId() {
         Profile authProfile = getAuthUser();
         if (authProfile == null) {
-            throw new AccessDeniedException("Access attempt by an un-authenticated user");
+            throw new ResourceNotFoundException("User with this JWT wasn't found");
         }
         return authProfile.getId();
     }
