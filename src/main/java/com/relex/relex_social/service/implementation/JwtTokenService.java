@@ -1,6 +1,7 @@
 package com.relex.relex_social.service.implementation;
 
 import com.relex.relex_social.entity.JwtToken;
+import com.relex.relex_social.entity.JwtType;
 import com.relex.relex_social.repository.JwtTokenRepository;
 import com.relex.relex_social.service.interfaces.IJwtTokenService;
 import lombok.RequiredArgsConstructor;
@@ -14,12 +15,11 @@ public class JwtTokenService implements IJwtTokenService {
 
     @Transactional
     @Override
-    public void registerToken(Long profileId, String token) {
-        jwtTokenRepository.deleteByProfileId(profileId);
-
+    public void registerToken(Long profileId, String token, JwtType type) {
         JwtToken jwtToken = JwtToken.builder()
                 .profileId(profileId)
                 .token(token)
+                .type(type)
                 .build();
 
         jwtTokenRepository.save(jwtToken);
@@ -31,7 +31,7 @@ public class JwtTokenService implements IJwtTokenService {
     }
 
     @Override
-    public void invalidToken(Long profileId) {
-        jwtTokenRepository.deleteByProfileId(profileId);
+    public void invalidTokens(Long profileId) {
+        jwtTokenRepository.deleteAllByProfileId(profileId);
     }
 }

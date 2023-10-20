@@ -12,11 +12,12 @@ import javax.persistence.*;
 @Builder
 @Data
 @Entity
-@Table(name = "jwtToken")
+@Table(name = "jwt_token")
 public class JwtToken {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
     Long profileId;
     String token;
+    JwtType type;
 }

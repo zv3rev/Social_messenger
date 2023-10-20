@@ -1,15 +1,16 @@
 package com.relex.relex_social.service.implementation;
 
 import com.relex.relex_social.dto.request.JwtRequest;
+import com.relex.relex_social.dto.response.JwtResponse;
+import com.relex.relex_social.entity.JwtType;
 import com.relex.relex_social.entity.Profile;
-import com.relex.relex_social.entity.ProfileStatus;
-import com.relex.relex_social.exception.AccessToDeletedAccountException;
 import com.relex.relex_social.exception.ResourceNotFoundException;
 import com.relex.relex_social.repository.ProfileRepository;
 import com.relex.relex_social.service.interfaces.IAuthService;
 import com.relex.relex_social.service.interfaces.IJwtTokenService;
 import com.relex.relex_social.utility.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -30,17 +31,17 @@ public class AuthService implements IAuthService {
 
     @Transactional
     @Override
-    public String createToken(JwtRequest jwtRequest) {
+    public JwtResponse createAccessToken(JwtRequest jwtRequest) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(jwtRequest.getUsername(), jwtRequest.getPassword()));
         UserDetails userDetails = profileDetailsService.loadUserByUsername(jwtRequest.getUsername());
-        String token = jwtTokenUtils.generateToken(userDetails);
+        String accessToken = jwtTokenUtils.generateAccessToken(userDetails);
+        String refreshToken = jwtTokenUtils.generateRefreshToken(userDetails);
         Profile profile = profileRepository.findByNickname(jwtRequest.getUsername())
                 .orElseThrow(() -> new ResourceNotFoundException("User wasn't found"));
-        if (profile.getProfileStatus().equals(ProfileStatus.DELETED)) {
-            throw new AccessToDeletedAccountException("You can not get access to deleted account");
-        }
-        jwtTokenService.registerToken(profile.getId(), token);
-        return token;
+        jwtTokenService.invalidTokens(profile.getId());
+        jwtTokenService.registerToken(profile.getId(), accessToken, JwtType.ACCESS);
+        jwtTokenService.registerToken(profile.getId(), refreshToken, JwtType.REFRESH);
+        return new JwtResponse(accessToken, refreshToken);
     }
 
 
@@ -65,6 +66,24 @@ public class AuthService implements IAuthService {
     @Transactional
     @Override
     public void deleteToken(Long profileId) {
-        jwtTokenService.invalidToken(profileId);
+        jwtTokenService.invalidTokens(profileId);
+    }
+
+    @Override
+    @Transactional
+    public JwtResponse refreshTokens(String refreshToken) {
+        if (!jwtTokenUtils.validateRefreshToken(refreshToken) && !jwtTokenService.isTokenValid(refreshToken)) {
+            throw new AccessDeniedException("This token is invalid");
+        }
+        String username = jwtTokenUtils.getUsernameFromRefreshToken(refreshToken);
+        UserDetails userDetails = profileDetailsService.loadUserByUsername(username);
+        Profile profile = profileRepository.findByNickname(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User wasn't found"));
+        jwtTokenService.invalidTokens(profile.getId());
+        String newAccessToken = jwtTokenUtils.generateAccessToken(userDetails);
+        String newRefreshToken = jwtTokenUtils.generateRefreshToken(userDetails);
+        jwtTokenService.registerToken(profile.getId(), newAccessToken, JwtType.ACCESS);
+        jwtTokenService.registerToken(profile.getId(), newRefreshToken, JwtType.REFRESH);
+        return new JwtResponse(newAccessToken, newRefreshToken);
     }
 }

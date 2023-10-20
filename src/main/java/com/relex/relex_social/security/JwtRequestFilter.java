@@ -33,7 +33,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
                                     @NonNull FilterChain chain) throws ServletException, IOException {
         String jwtToken = getJwtTokenFromRequest(request);
-        if (jwtToken != null && jwtTokenUtils.validateToken(jwtToken)) {
+        if (jwtToken != null && jwtTokenUtils.validateAccessToken(jwtToken)) {
             setSecurityContextHolderAuthentication(request, jwtToken);
         }
         chain.doFilter(request, response);
@@ -48,8 +48,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     }
 
     private void setSecurityContextHolderAuthentication(HttpServletRequest request, String jwtToken) {
-        String username = jwtTokenUtils.getUsername(jwtToken);
-        List<String> roles = jwtTokenUtils.getRoles(jwtToken);
+        String username = jwtTokenUtils.getUsernameFromAccessToken(jwtToken);
+        List<String> roles = jwtTokenUtils.getRolesFromAccessToken(jwtToken);
         if (username != null && jwtTokenService.isTokenValid(jwtToken) && SecurityContextHolder.getContext().getAuthentication() == null) {
             UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
                     username, null, roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()));

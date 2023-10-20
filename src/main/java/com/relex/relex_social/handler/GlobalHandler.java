@@ -20,11 +20,6 @@ import java.util.logging.Level;
 @ControllerAdvice
 @Log
 public class GlobalHandler {
-
-    private ResponseEntity getResponseEntity(Throwable e, HttpStatus httpStatus) {
-        return new ResponseEntity(new AppErrorDto(httpStatus.value(), e.getMessage()), httpStatus);
-    }
-
     @ExceptionHandler(BindException.class)
     protected ResponseEntity<Object> handleBindException(BindException e) {
         List<String> errors = e.getAllErrors().stream()
@@ -101,5 +96,9 @@ public class GlobalHandler {
     protected ResponseEntity handlePermanentlyDeletedAccountException(PermanentlyDeletedAccountException e) {
         log.log(Level.INFO, "Attempt to restore permanently deleted account", e);
         return getResponseEntity(e, HttpStatus.BAD_REQUEST);
+    }
+
+    private ResponseEntity getResponseEntity(Throwable e, HttpStatus httpStatus) {
+        return new ResponseEntity(new AppErrorDto(httpStatus.value(), e.getMessage()), httpStatus);
     }
 }

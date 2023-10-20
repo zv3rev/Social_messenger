@@ -73,7 +73,7 @@ public class ProfileService implements IProfileService {
             throw new NicknameAlreadyExistsException("This nickname is already occupied");
         }
         if (!profile.getEmail().equals(editProfileRequest.getEmail()) && profileRepository.existsByEmail(editProfileRequest.getEmail())) {
-                throw new EmailAlreadyExistsException("This email is already occupied");
+            throw new EmailAlreadyExistsException("This email is already occupied");
         }
 
         profile.setNickname(editProfileRequest.getNickname());
@@ -104,7 +104,7 @@ public class ProfileService implements IProfileService {
         profileToDelete.setProfileStatus(ProfileStatus.DELETED);
         profileToDelete.setDeleteDate(new Timestamp(new Date().getTime()));
         profileRepository.save(profileToDelete);
-        jwtTokenService.invalidToken(profileId);
+        jwtTokenService.invalidTokens(profileId);
     }
 
     @Override

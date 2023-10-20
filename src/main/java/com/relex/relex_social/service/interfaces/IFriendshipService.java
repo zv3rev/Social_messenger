@@ -7,7 +7,9 @@ import java.util.List;
 
 public interface IFriendshipService {
     List<ProfileDto> getFriendsListWithVisibilityCheck(Long profileId);
+
     List<ProfileDto> getFriendsListWithoutVisibilityCheck(Long profileId);
+
     FriendshipDto sendRequest(Long profileId, Long friendId);
 
     List<FriendshipDto> getProfileRequests(Long profileId);

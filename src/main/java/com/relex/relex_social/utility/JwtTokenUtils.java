@@ -23,49 +23,78 @@ import java.util.stream.Collectors;
 @Component
 @Log
 public class JwtTokenUtils {
-    @Value("${jwt.secret}")
-    private String secret;
+    @Value("${jwt.access.secret}")
+    private String accessSecret;
 
-    @Value("${jwt.lifetime}")
-    private Duration jwtLifetime;
+    @Value("${jwt.access.lifetime}")
+    private Duration accessLifetime;
 
-    public String generateToken(UserDetails userDetails) {
+    @Value("${jwt.refresh.secret}")
+    private String refreshSecret;
+
+    @Value("${jwt.refresh.lifetime}")
+    private Duration refreshLifetime;
+
+    public String generateAccessToken(UserDetails userDetails) {
         Date issuedDate = new Date();
-        Date expiredDate = new Date(issuedDate.getTime() + jwtLifetime.toMillis());
+        Date expiredDate = new Date(issuedDate.getTime() + accessLifetime.toMillis());
         Map<String, Object> claims = new HashMap<>();
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
         claims.put("roles", roles);
 
-        /// TODO: 07.10.2023 добавить сохранение токена в базу вместе с id
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(issuedDate)
                 .setExpiration(expiredDate)
-                .signWith(Keys.hmacShaKeyFor(secret.getBytes()))
+                .signWith(Keys.hmacShaKeyFor(accessSecret.getBytes()))
                 .compact();
     }
 
-    private Claims getClaims(String token) {
+    public String generateRefreshToken(UserDetails userDetails) {
+        Date issuedDate = new Date();
+        Date expiredDate = new Date(issuedDate.getTime() + refreshLifetime.toMillis());
+
+        return Jwts.builder()
+                .setSubject(userDetails.getUsername())
+                .setIssuedAt(issuedDate)
+                .setExpiration(expiredDate)
+                .signWith(Keys.hmacShaKeyFor(refreshSecret.getBytes()))
+                .compact();
+    }
+
+    private Claims getClaims(String token, String secret) {
         return Jwts.parserBuilder()
                 .setSigningKey(secret.getBytes())
                 .build().parseClaimsJws(token).getBody();
     }
 
-    public String getUsername(String token) {
-        return getClaims(token).getSubject();
+    public String getUsernameFromAccessToken(String token) {
+        return getClaims(token, accessSecret).getSubject();
     }
 
-    public List<String> getRoles(String token) {
-        return getClaims(token).get("roles", List.class);
+    public String getUsernameFromRefreshToken(String token) {
+        return getClaims(token, refreshSecret).getSubject();
     }
 
-    public boolean validateToken(String token) {
+    public List<String> getRolesFromAccessToken(String token) {
+        return getClaims(token, accessSecret).get("roles", List.class);
+    }
+
+    public boolean validateAccessToken(String token) {
+        return validateToken(token, accessSecret);
+    }
+
+    public boolean validateRefreshToken(String token) {
+        return validateToken(token, refreshSecret);
+    }
+
+    private boolean validateToken(String token, String key) {
         try {
             Jwts.parserBuilder()
-                    .setSigningKey(secret.getBytes())
+                    .setSigningKey(key.getBytes())
                     .build().parseClaimsJws(token);
             return true;
         } catch (SignatureException e) {
